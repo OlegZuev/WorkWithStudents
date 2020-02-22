@@ -3,21 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Students {
-    public class Student {
+    [XmlInclude(typeof(Bachelor))]
+    [XmlInclude(typeof(Master))]
+    public abstract class Student {
         public string Firstname { get; set; }
 
         public string Lastname { get; set; }
 
         public string Faculty { get; set; }
-
-        public Student(string firstname, string lastname, string faculty) {
-            Firstname = firstname;
-            Lastname = lastname;
-            Faculty = faculty;
-        }
-
-        public Student() { }
     }
 }

@@ -102,7 +102,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\BooleanConverter.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\IsNullToBooleanConverter.cs" />
+    <Compile Include="Converters\PropertyToLocalizedStringConverter.cs" />
     <Compile Include="Model\DelegateCommand.cs" />
+    <Compile Include="Converters\IndexToBooleanConverter.cs" />
     <Compile Include="Model\Interaction.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />

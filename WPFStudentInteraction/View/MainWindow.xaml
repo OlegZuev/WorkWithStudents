@@ -5,74 +5,103 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFStudentInteraction"
         xmlns:viewModel="clr-namespace:WPFStudentInteraction.ViewModel"
+        xmlns:model="clr-namespace:WPFStudentInteraction.Model"
+        xmlns:converters="clr-namespace:WPFStudentInteraction.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="500">
     <Window.DataContext>
         <viewModel:MainWindowViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <converters:IndexToBooleanConverter x:Key="IndexToBooleanConverter" />
+        <converters:IsNullToBooleanConverter x:Key="IsNullToBooleanConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
+                                                 True="Visible"
+                                                 False="Hidden"/>
+        <converters:PropertyToLocalizedStringConverter x:Key="PropertyToLocalizedStringConverter" />
+    </Window.Resources>
     <Border Padding="2">
         <StackPanel>
+            <!-- Меню -->
             <Menu>
                 <MenuItem Header="Файл">
-                    <MenuItem Header="Открыть" Command="{Binding OpenStudentListCommand}"/>
-                    <MenuItem Header="Сохранить" Command="{Binding SaveStudentListCommand}"/>
-                    <MenuItem Header="Создать новый список" />
+                    <MenuItem Header="Открыть" Command="{Binding OpenStudentListCommand}" />
+                    <MenuItem Header="Сохранить" Command="{Binding SaveStudentListCommand}" />
+                    <MenuItem Header="Создать новый список" Command="{Binding CreateStudentListCommand}" />
                 </MenuItem>
                 <MenuItem Header="Просмотр">
-                    <MenuItem Header="Предыдущий" />
-                    <MenuItem Header="Следующий" />
+                    <MenuItem Header="Предыдущий" Command="{Binding PrevStudentCommand}" />
+                    <MenuItem Header="Следующий" Command="{Binding NextStudentCommand}" />
                 </MenuItem>
                 <MenuItem Header="Студенты">
                     <MenuItem Header="Добавить студента" Command="{Binding AddStudentCommand}"/>
-                    <MenuItem Header="Удалить студента" />
+                    <MenuItem Header="Удалить студента" Command="{Binding RemoveStudentCommand}" />
                 </MenuItem>
             </Menu>
 
+            <!-- Данные о студенте -->
+            <StackPanel>
+                <!-- Имя -->
+                <Grid Margin="0 30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Имя" VerticalAlignment="Center" TextAlignment="Right"
+                               Margin="10 0" />
+                    <TextBox Grid.Column="1" Padding="2" Margin="0 0 100 0"
+                             Text="{Binding CurrentStudent.Firstname, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding Path=CurrentStudent, Converter={StaticResource IsNullToBooleanConverter}}" />
+                </Grid>
+
+                <!-- Фамилия -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Фамилия" VerticalAlignment="Center" TextAlignment="Right"
+                               Margin="10 0" />
+                    <TextBox Grid.Column="1" Padding="2" Margin="0 0 100 0"
+                             Text="{Binding CurrentStudent.Lastname, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding Path=CurrentStudent, Converter={StaticResource IsNullToBooleanConverter}}" />
+                </Grid>
+
+                <!-- Факультет -->
+                <Grid Margin="0 30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Факультет" VerticalAlignment="Center" TextAlignment="Right"
+                               Margin="10 0" />
+                    <TextBox Grid.Column="1" Padding="2" Margin="0 0 100 0"
+                             Text="{Binding CurrentStudent.Faculty, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding Path=CurrentStudent, Converter={StaticResource IsNullToBooleanConverter}}" />
+                </Grid>
+            </StackPanel>
+
             <Grid Margin="0 30">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Text="Имя" VerticalAlignment="Center" TextAlignment="Right" Margin="10 0" />
-                <TextBox Grid.Column="1" Padding="2" Margin="0 0 100 0"
-                         Text="{Binding CurrentStudent.Firstname, UpdateSourceTrigger=PropertyChanged}" />
-            </Grid>
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Text="Фамилия" VerticalAlignment="Center" TextAlignment="Right"
-                           Margin="10 0" />
-                <TextBox Grid.Column="1" Padding="2" Margin="0 0 100 0"
-                         Text="{Binding CurrentStudent.Lastname, UpdateSourceTrigger=PropertyChanged}" />
-            </Grid>
-
-            <Grid Margin="0 30">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Text="Факультет" VerticalAlignment="Center" TextAlignment="Right"
-                           Margin="10 0" />
-                <TextBox Grid.Column="1" Padding="2" Margin="0 0 100 0"
-                         Text="{Binding CurrentStudent.Faculty, UpdateSourceTrigger=PropertyChanged}" />
-            </Grid>
-
-            <Grid Margin="0 30">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Предыдущий" Margin="20 0" Padding="0 10" />
-                <Button Grid.Column="1" Content="Следующий" Margin="20 0" Padding="0 10" />
+                <!-- Предыдущий студент -->
+                <Button Grid.Column="0" Content="Предыдущий" Margin="20 0" Padding="0 10"
+                        Command="{Binding PrevStudentCommand}"
+                        Visibility="{Binding HasPrevStudent, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <!-- Следующий студент -->
+                <Button Grid.Column="1" Content="Следующий" Margin="20 0" Padding="0 10"
+                        Command="{Binding NextStudentCommand}"
+                        Visibility="{Binding HasNextStudent, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
 
+            <!-- Поиск -->
             <GroupBox Header="Поиск">
                 <Grid Margin="0 30">
                     <Grid.ColumnDefinitions>
@@ -81,9 +110,18 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <ComboBox Grid.Column="0" Margin="20 0 10 0" />
+                    <ComboBox Name="CbSearchAttributes" Grid.Column="0" Margin="20 0 10 0"
+                              ItemsSource="{Binding SearchAttributes}"
+                              SelectedItem="{Binding SelectedSearchAttribute}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource PropertyToLocalizedStringConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                     <TextBlock Grid.Column="1" Text="=" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <TextBox Grid.Column="2" Padding="2" Margin="10 0 20 0" />
+                    <TextBox Grid.Column="2" Padding="2" Margin="10 0 20 0" Text="{Binding QueryText, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding ElementName=CbSearchAttributes, Path=SelectedIndex, Converter={StaticResource IndexToBooleanConverter}}" />
                 </Grid>
             </GroupBox>
         </StackPanel>

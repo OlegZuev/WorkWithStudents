@@ -61,6 +61,15 @@ namespace WPFStudentInteraction.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to dsds.
+        /// </summary>
+        internal static string _123123 {
+            get {
+                return ResourceManager.GetString("123123", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Следующего студента нет.
         /// </summary>
         internal static string AboveRange {
@@ -75,6 +84,33 @@ namespace WPFStudentInteraction.Properties {
         internal static string BelowRange {
             get {
                 return ResourceManager.GetString("BelowRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Факультет.
+        /// </summary>
+        internal static string Faculty {
+            get {
+                return ResourceManager.GetString("Faculty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Имя.
+        /// </summary>
+        internal static string Firstname {
+            get {
+                return ResourceManager.GetString("Firstname", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Фамилия.
+        /// </summary>
+        internal static string Lastname {
+            get {
+                return ResourceManager.GetString("Lastname", resourceCulture);
             }
         }
         
