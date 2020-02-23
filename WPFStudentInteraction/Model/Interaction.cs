@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Win32;
 using Students;
+using WPFStudentInteraction.View;
 
 namespace WPFStudentInteraction.Model {
     public static class Interaction {
@@ -24,14 +25,19 @@ namespace WPFStudentInteraction.Model {
             return students.ToList().Find(s => FilterByPropertyValue(s, selectedSearchAttribute, queryText));
         }
 
-        public static void AddStudent(IList<Student> students, out Student currentStudent) {
+        // ReSharper disable once RedundantAssignment
+        public static void AddStudent(IList<Student> students, out Student currentStudent, ref CreationStudentWindow window) {
             Contract.Assert(students != null, "students != null");
 
-            var newStudent = new Bachelor();
-            //MessageBox.Show("Вы хотите добавить бакалавра или магистра?", "Добавление студента")
-            // Написать свой MessageBox
-            students.Add(newStudent);
-            currentStudent = newStudent;
+            window = new CreationStudentWindow {Owner = Application.Current.MainWindow};
+            if (window.ShowDialog() == true) {
+                var newStudent = Activator.CreateInstance(window.Result) as Student;
+                students.Add(newStudent);
+                currentStudent = newStudent;
+            } else {
+                currentStudent = null;
+            }
+
         }
 
         public static void RemoveStudent(IList<Student> students, Student currentStudent,
@@ -47,12 +53,11 @@ namespace WPFStudentInteraction.Model {
                        resultB != -1 && resultB < students.Count) {
                 anotherStudentIndex = resultB - 1;
             } else {
-                result = null;
-                return;
+                anotherStudentIndex = -1;
             }
 
             students.Remove(currentStudent);
-            result = students[anotherStudentIndex];
+            result = anotherStudentIndex == -1 ? null : students[anotherStudentIndex];
         }
 
         public static void NextStudent(IList<Student> students, Student currentStudent,
@@ -112,7 +117,7 @@ namespace WPFStudentInteraction.Model {
         private static bool FilterByPropertyValue<T>(T obj, PropertyInfo property, string value) {
             string propertyValue = (string) obj.GetType().GetProperties().ToList()
                                                .Find(p => p.Name == property.Name)
-                                               .GetValue(obj);
+                                               ?.GetValue(obj) ?? "";
             return Regex.IsMatch(propertyValue, $"^{value}.*$");
         }
 
@@ -124,9 +129,8 @@ namespace WPFStudentInteraction.Model {
             }
 
             var xmlSerializer = new XmlSerializer(typeof(T));
-            using (XmlReader reader = XmlReader.Create(new FileStream(openFileDialog.FileName, FileMode.Open))) {
-                students = (T) xmlSerializer.Deserialize(reader);
-            }
+            using XmlReader reader = XmlReader.Create(new FileStream(openFileDialog.FileName, FileMode.Open));
+            students = (T) xmlSerializer.Deserialize(reader);
         }
 
         public static void SaveStudentList(IEnumerable<Student> students) {
@@ -134,17 +138,50 @@ namespace WPFStudentInteraction.Model {
 
             var openFileDialog = new OpenFileDialog();
 
-            if (openFileDialog.ShowDialog() != true)
-                throw new FileNotFoundException(Properties.Resources.XmlFileNotFound);
-
-            var xmlSerializer = new XmlSerializer(students.GetType());
-            using (var writer = new FileStream(openFileDialog.FileName, FileMode.Create)) {
-                xmlSerializer.Serialize(writer, students);
+            if (openFileDialog.ShowDialog() != true) {
+                return;
             }
+            
+            var xmlSerializer = new XmlSerializer(students.GetType());
+            using var writer = new FileStream(openFileDialog.FileName, FileMode.Create);
+            xmlSerializer.Serialize(writer, students);
         }
 
         public static void CreateStudentList<T>(out T students) where T : IEnumerable<Student>, new() {
             students = new T();
+        }
+
+        public static bool IsSameTypeStudentExists(IEnumerable<Student> students, Student student) {
+            Contract.Assert(students != null, "students != null");
+            return student != null && students.Any(s => s.GetType() == student.GetType());
+        }
+
+        public static void RemoveRedundantProperties(IList<Student> students, Student student, IList<PropertyInfo> attributes) {
+            if (students is null || attributes is null || IsSameTypeStudentExists(students, student)) {
+                return;
+            }
+
+            student?.GetType().GetProperties().ToList().ForEach(property => {
+                if (students.All(p => p.GetType().GetProperties().All(s => s.Name != property.Name))) {
+                    attributes.Remove(property);
+                }
+            });
+        }
+
+        public static void AddMissingProperties(Student student, IList<PropertyInfo> attributes) {
+            student?.GetType().GetProperties().ToList().ForEach(elem => {
+                if (attributes.All(p => p.Name != elem.Name)) {
+                    attributes.Add(elem);
+                }
+            });
+        }
+
+        public static void PromoteToMasterStudent(Student student, out Student promotedStudent) {
+            Contract.Assert(student != null, "student != null");
+
+            promotedStudent = new Master {
+                Firstname = student.Firstname, Lastname = student.Lastname, Faculty = student.Faculty
+            };
         }
     }
 }

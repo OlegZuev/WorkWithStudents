@@ -22,7 +22,7 @@ namespace WPFStudentInteraction.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WPFStudentInteraction.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WPFStudentInteraction.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace WPFStudentInteraction.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,36 +61,45 @@ namespace WPFStudentInteraction.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to dsds.
-        /// </summary>
-        internal static string _123123 {
-            get {
-                return ResourceManager.GetString("123123", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Следующего студента нет.
         /// </summary>
-        internal static string AboveRange {
+        public static string AboveRange {
             get {
                 return ResourceManager.GetString("AboveRange", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Бакалавр.
+        /// </summary>
+        public static string BachelorFriendlyName {
+            get {
+                return ResourceManager.GetString("BachelorFriendlyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Предыдущего студента нет.
         /// </summary>
-        internal static string BelowRange {
+        public static string BelowRange {
             get {
                 return ResourceManager.GetString("BelowRange", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Диплом.
+        /// </summary>
+        public static string Diploma {
+            get {
+                return ResourceManager.GetString("Diploma", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Факультет.
         /// </summary>
-        internal static string Faculty {
+        public static string Faculty {
             get {
                 return ResourceManager.GetString("Faculty", resourceCulture);
             }
@@ -99,7 +108,7 @@ namespace WPFStudentInteraction.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Имя.
         /// </summary>
-        internal static string Firstname {
+        public static string Firstname {
             get {
                 return ResourceManager.GetString("Firstname", resourceCulture);
             }
@@ -108,16 +117,43 @@ namespace WPFStudentInteraction.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Фамилия.
         /// </summary>
-        internal static string Lastname {
+        public static string Lastname {
             get {
                 return ResourceManager.GetString("Lastname", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Магистр.
+        /// </summary>
+        public static string MasterFriendlyName {
+            get {
+                return ResourceManager.GetString("MasterFriendlyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Вы хотите добавить бакалавра или магистра?.
+        /// </summary>
+        public static string StudentCreationQuestion {
+            get {
+                return ResourceManager.GetString("StudentCreationQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Неизвестный тип студента.
+        /// </summary>
+        public static string UnexpectedStudentType {
+            get {
+                return ResourceManager.GetString("UnexpectedStudentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Не удалось найти файл.
         /// </summary>
-        internal static string XmlFileNotFound {
+        public static string XmlFileNotFound {
             get {
                 return ResourceManager.GetString("XmlFileNotFound", resourceCulture);
             }

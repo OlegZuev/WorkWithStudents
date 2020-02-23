@@ -1,34 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.IO;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Resources;
-using System.Windows;
 using System.Windows.Input;
-using System.Xml.Serialization;
 using Students;
 using WPFStudentInteraction.Model;
+using WPFStudentInteraction.View;
 
 namespace WPFStudentInteraction.ViewModel {
     public class MainWindowViewModel : BaseViewModel {
+        private CreationStudentWindow _creationStudentWindow;
         private ObservableCollection<Student> _students;
 
         private Student _currentStudent;
 
         private int _currentStudentIndex;
 
-        private List<PropertyInfo> _searchAttributes;
+        private ObservableCollection<PropertyInfo> _searchAttributes;
 
-        public List<PropertyInfo> SearchAttributes {
-            get => _searchAttributes;
-            set {
-                _searchAttributes = value;
-                OnPropertyChanged(nameof(SearchAttributes));
-            }
-        }
+        public ObservableCollection<PropertyInfo> SearchAttributes => _searchAttributes ??= new ObservableCollection<PropertyInfo>();
 
         private PropertyInfo _selectedSearchAttribute;
 
@@ -65,10 +54,9 @@ namespace WPFStudentInteraction.ViewModel {
 
                 _currentStudent = value;
                 _currentStudentIndex = _students.IndexOf(_currentStudent);
-                SearchAttributes = _currentStudent != null
-                    ? new List<PropertyInfo>(_currentStudent.GetType().GetProperties())
-                    : null;
+                Interaction.AddMissingProperties(_currentStudent, SearchAttributes);
 
+                OnPropertyChanged(nameof(Diploma));
                 OnPropertyChanged(nameof(CurrentStudent));
             }
         }
@@ -93,9 +81,23 @@ namespace WPFStudentInteraction.ViewModel {
             }
         }
 
+        public string Diploma {
+            get {
+                PropertyInfo property = _currentStudent?.GetType().GetProperties().FirstOrDefault(p => p.Name == nameof(Diploma));
+                return property?.GetValue(_currentStudent) as string;
+            }
+            set {
+                PropertyInfo property = _currentStudent?.GetType().GetProperties().FirstOrDefault(p => p.Name == nameof(Diploma));
+                property?.SetValue(_currentStudent, value);
+                OnPropertyChanged(nameof(Diploma));
+            }
+        }
+
         public MainWindowViewModel() {
             AddStudentCommand = new DelegateCommand(o => {
-                Interaction.AddStudent(_students, out Student result);
+                Interaction.AddStudent(_students, out Student result, ref _creationStudentWindow);
+                if (result == null) return;
+
                 CurrentStudent = result;
                 _queryText = string.Empty;
                 OnPropertyChanged(QueryText);
@@ -104,6 +106,7 @@ namespace WPFStudentInteraction.ViewModel {
             RemoveStudentCommand = new DelegateCommand(o => {
                 Interaction.RemoveStudent(_students, _currentStudent, SelectedSearchAttribute, QueryText,
                                           out Student result);
+                Interaction.RemoveRedundantProperties(_students, _currentStudent, SearchAttributes);
                 CurrentStudent = result;
             }, o => _students?.Count > 0 && _currentStudent != null);
 
@@ -132,16 +135,31 @@ namespace WPFStudentInteraction.ViewModel {
 
             OpenStudentListCommand = new DelegateCommand(o => {
                 Interaction.OpenStudentList(out _students);
+                if (_students == null) return;
+
+                SearchAttributes.Clear();
+                _students?.ToList().ForEach(student => Interaction.AddMissingProperties(student, SearchAttributes));
                 CurrentStudent = _students?.FirstOrDefault();
             });
 
-            SaveStudentListCommand = new DelegateCommand(o => { Interaction.SaveStudentList(_students); });
+            SaveStudentListCommand = new DelegateCommand(o => {
+                Interaction.SaveStudentList(_students);
+            }, o => _students != null && _students.Any());
 
             CreateStudentListCommand = new DelegateCommand(o => {
                 Interaction.CreateStudentList(out _students);
                 CurrentStudent = null;
-                SearchAttributes = null;
             });
+
+            GetNewStudentTypeCommand = new DelegateCommand(content => {
+                CreationStudentModel.GetNewStudentType(content as string, _creationStudentWindow);
+            });
+
+            PromoteToMasterStudentCommand = new DelegateCommand(o => {
+                Interaction.PromoteToMasterStudent(_currentStudent, out Student promotedStudent);
+                _students[_currentStudentIndex] = promotedStudent;
+                CurrentStudent = promotedStudent;
+            }, o => _currentStudent != null);
         }
 
         public ICommand AddStudentCommand { get; }
@@ -157,5 +175,9 @@ namespace WPFStudentInteraction.ViewModel {
         public ICommand SaveStudentListCommand { get; }
 
         public ICommand CreateStudentListCommand { get; }
+
+        public ICommand GetNewStudentTypeCommand { get; }
+
+        public ICommand PromoteToMasterStudentCommand { get; }
     }
 }
