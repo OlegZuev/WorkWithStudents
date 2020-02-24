@@ -26,7 +26,8 @@ namespace WPFStudentInteraction.Model {
         }
 
         // ReSharper disable once RedundantAssignment
-        public static void AddStudent(IList<Student> students, out Student currentStudent, ref CreationStudentWindow window) {
+        public static void AddStudent(IList<Student> students, out Student currentStudent,
+                                      ref CreationStudentWindow window) {
             Contract.Assert(students != null, "students != null");
 
             window = new CreationStudentWindow {Owner = Application.Current.MainWindow};
@@ -37,7 +38,6 @@ namespace WPFStudentInteraction.Model {
             } else {
                 currentStudent = null;
             }
-
         }
 
         public static void RemoveStudent(IList<Student> students, Student currentStudent,
@@ -122,7 +122,7 @@ namespace WPFStudentInteraction.Model {
         }
 
         public static void OpenStudentList<T>(out T students) where T : IEnumerable<Student> {
-            var openFileDialog = new OpenFileDialog();
+            var openFileDialog = new OpenFileDialog {DefaultExt = ".xml", Filter = "XML файлы|*.xml" };
             if (openFileDialog.ShowDialog() != true) {
                 students = default;
                 return;
@@ -136,14 +136,14 @@ namespace WPFStudentInteraction.Model {
         public static void SaveStudentList(IEnumerable<Student> students) {
             Contract.Assert(students != null, "students != null");
 
-            var openFileDialog = new OpenFileDialog();
+            var saveFileDialog = new SaveFileDialog {DefaultExt = ".xml", Filter = "XML файлы|*.xml" };
 
-            if (openFileDialog.ShowDialog() != true) {
+            if (saveFileDialog.ShowDialog() != true) {
                 return;
             }
-            
+
             var xmlSerializer = new XmlSerializer(students.GetType());
-            using var writer = new FileStream(openFileDialog.FileName, FileMode.Create);
+            using var writer = new FileStream(saveFileDialog.FileName, FileMode.Create);
             xmlSerializer.Serialize(writer, students);
         }
 
@@ -156,14 +156,15 @@ namespace WPFStudentInteraction.Model {
             return student != null && students.Any(s => s.GetType() == student.GetType());
         }
 
-        public static void RemoveRedundantProperties(IList<Student> students, Student student, IList<PropertyInfo> attributes) {
+        public static void RemoveRedundantProperties(IList<Student> students, Student student,
+                                                     IList<PropertyInfo> attributes) {
             if (students is null || attributes is null || IsSameTypeStudentExists(students, student)) {
                 return;
             }
 
             student?.GetType().GetProperties().ToList().ForEach(property => {
                 if (students.All(p => p.GetType().GetProperties().All(s => s.Name != property.Name))) {
-                    attributes.Remove(property);
+                    attributes.Remove(attributes.First(innerP => innerP.Name == property.Name));
                 }
             });
         }

@@ -149,6 +149,7 @@ namespace WPFStudentInteraction.ViewModel {
             CreateStudentListCommand = new DelegateCommand(o => {
                 Interaction.CreateStudentList(out _students);
                 CurrentStudent = null;
+                SearchAttributes.Clear();
             });
 
             GetNewStudentTypeCommand = new DelegateCommand(content => {
